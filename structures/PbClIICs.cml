@@ -1,0 +1,11 @@
+<molecule>
+ <atomArray>
+  <atom id="a1" elementType="Cs" x3="0.204211" y3="0.000000" z3="3.652534" label="352"/>
+  <atom id="a2" elementType="Pb" x3="0.013514" y3="0.000000" z3="-0.619608" label="356"/>
+  <atom id="a3" elementType="Cl" x3="2.185984" y3="-0.000000" z3="0.936544" label="344"/>
+  <atom id="a4" elementType="I" x3="-1.286855" y3="-2.254058" z3="0.902765" label="346"/>
+  <atom id="a5" elementType="I" x3="-1.286855" y3="2.254058" z3="0.902765" label="346"/>
+ </atomArray>
+ <bondArray>
+ </bondArray>
+</molecule>
