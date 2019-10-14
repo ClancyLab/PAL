@@ -1,0 +1,355 @@
+
+<script>
+function doSomething() {
+    event.preventDefault();
+
+    var all_cations = {
+        "cation_cs": document.getElementById("cation_cs").value,
+        "cation_ma": document.getElementById("cation_ma").value,
+        "cation_fa": document.getElementById("cation_fa").value
+    };
+
+    var all_halides = {
+        "halide_cl": document.getElementById("halide_cl").value,
+        "halide_br": document.getElementById("halide_br").value,
+        "halide_i": document.getElementById("halide_i").value
+    };
+
+    var all_solvents = {
+        "solvent_thto": document.getElementById("solvent_thto").value,
+        "solvent_dmso": document.getElementById("solvent_dmso").value,
+        "solvent_nm": document.getElementById("solvent_nm").value,
+        "solvent_nmp": document.getElementById("solvent_nmp").value,
+        "solvent_ace": document.getElementById("solvent_ace").value,
+        "solvent_mcr": document.getElementById("solvent_mcr").value,
+        "solvent_gbl": document.getElementById("solvent_gbl").value,
+        "solvent_dmf": document.getElementById("solvent_dmf").value,
+        "solvent_dma": document.getElementById("solvent_dma").value,
+        "solvent_eth": document.getElementById("solvent_eth").value,
+        "solvent_chcl3": document.getElementById("solvent_chcl3").value,
+        "solvent_ipa": document.getElementById("solvent_ipa").value,
+        "solvent_pyr": document.getElementById("solvent_pyr").value,
+        "solvent_ch3oh": document.getElementById("solvent_ch3oh").value,
+        "solvent_fam": document.getElementById("solvent_fam").value,
+        "solvent_h20": document.getElementById("solvent_h20").value
+    };
+
+    var use_arithmetic_mean = true;
+    var radios = document.getElementsByName('mean');
+    for (var i = 0, length = radios.length; i < length; i++){
+        if (radios[i].checked){
+            use_arithmetic_mean = "arithmetic" == radios[i].value;
+            break;
+        }
+    }
+
+    var low_energy = 0.0;
+    var high_energy = -11.3;
+    var cutoffs = [
+        [0.9, "Very unlikely to form a precursor."],
+        [0.8, "Unlikely to form a precursor."],
+        [0.6, "Likely to form some precursor."],
+        [0.3, "Very likely to form a precursor."],
+        [0.0, "Almost guaranteed to form a precursor."]
+    ];
+
+    // Ensure all values are normalized
+    var total = 0.0;
+    for (name in all_cations)
+        if (all_cations[name] != "")
+            total += parseFloat(all_cations[name]);
+    if (total > 0.0){
+        for (name in all_cations)
+            if (all_cations[name] != "")
+                all_cations[name] /= total;
+    }
+
+    total = 0.0;
+    for (name in all_halides)
+        if (all_halides[name] != "")
+            total += parseFloat(all_halides[name]);
+    if (total > 0.0){
+        for (name in all_halides)
+            if (all_halides[name] != "")
+                all_halides[name] /= total;
+    }
+
+    total = 0.0;
+    for (name in all_solvents)
+        if (all_solvents[name] != "")
+            total += parseFloat(all_solvents[name]);
+    if (total > 0.0){
+        for (name in all_solvents)
+            if (all_solvents[name] != "")
+                all_solvents[name] /= total;
+    }
+
+    var data = {
+        'MAPbBrBrBr_GBL': -5.93,
+        'CsPbClClCl_PYR': -2.72,
+        'CsPbClClCl_CH3OH': -7.31,
+        'FAPbClClCl_NMP': -7.9,
+        'MAPbBrBrBr_H2O': -5.19,
+        'FAPbBrBrBr_PYR': -11.27,
+        'FAPbClClCl_DMSO': -9.91,
+        'CsPbBrBrBr_CHCl3': -1.47,
+        'FAPbBrBrBr_IPA': -3.94,
+        'MAPbClClCl_NM': -4.97,
+        'CsPbBrBrBr_NM': -3.6,
+        'CsPbBrBrBr_ETH': -4.28,
+        'FAPbIII_MCR': -4.3,
+        'CsPbIII_ETH': -3.56,
+        'MAPbIII_ACE': -5.83,
+        'FAPbClClCl_FAM': -8.26,
+        'FAPbClClCl_CH3OH': -6.1,
+        'CsPbIII_DMF': -8.03,
+        'FAPbIII_H2O': -7.48,
+        'CsPbIII_DMA': -7.87,
+        'MAPbBrBrBr_DMA': -8.22,
+        'MAPbBrBrBr_DMF': -8.4,
+        'CsPbClClCl_ACE': -6.02,
+        'MAPbBrBrBr_CHCl3': -1.62,
+        'MAPbIII_IPA': -4.64,
+        'MAPbClClCl_FAM': -7.97,
+        'MAPbIII_NM': -4.14,
+        'MAPbBrBrBr_CH3OH': -4.62,
+        'MAPbClClCl_NMP': -8.79,
+        'CsPbClClCl_IPA': -4.53,
+        'FAPbBrBrBr_FAM': -7.37,
+        'MAPbIII_THTO': -10.19,
+        'CsPbIII_NMP': -7.59,
+        'FAPbBrBrBr_DMSO': -9.66,
+        'CsPbBrBrBr_IPA': -4.18,
+        'CsPbClClCl_H2O': -5.83,
+        'CsPbIII_CH3OH': -3.76,
+        'CsPbClClCl_ETH': -4.52,
+        'FAPbIII_DMA': -7.48,
+        'CsPbIII_DMSO': -9.62,
+        'FAPbIII_CHCl3': -1.68,
+        'CsPbClClCl_DMSO': -10.18,
+        'FAPbClClCl_GBL': -6.63,
+        'FAPbIII_CH3OH': -5.97,
+        'MAPbClClCl_ACE': -6.53,
+        'MAPbBrBrBr_ETH': -4.6,
+        'FAPbClClCl_CHCl3': -1.32,
+        'CsPbIII_NM': -3.66,
+        'FAPbClClCl_THTO': -8.65,
+        'FAPbClClCl_H2O': -9.28,
+        'MAPbIII_FAM': -7.25,
+        'MAPbIII_CH3OH': -4.6,
+        'CsPbBrBrBr_NMP': -7.0,
+        'CsPbClClCl_MCR': -4.59,
+        'MAPbClClCl_DMSO': -11.16,
+        'CsPbIII_THTO': -10.02,
+        'MAPbBrBrBr_NM': -5.09,
+        'MAPbBrBrBr_DMSO': -10.27,
+        'CsPbBrBrBr_CH3OH': -3.71,
+        'MAPbBrBrBr_FAM': -7.28,
+        'FAPbBrBrBr_CH3OH': -5.76,
+        'MAPbClClCl_IPA': -5.03,
+        'MAPbBrBrBr_ACE': -5.79,
+        'FAPbIII_ETH': -4.19,
+        'MAPbClClCl_DMA': -8.95,
+        'MAPbClClCl_DMF': -9.11,
+        'MAPbBrBrBr_IPA': -4.6,
+        'FAPbBrBrBr_DMA': -7.25,
+        'FAPbBrBrBr_DMF': -7.58,
+        'CsPbBrBrBr_ACE': -5.45,
+        'CsPbBrBrBr_GBL': -5.53,
+        'MAPbBrBrBr_THTO': -10.59,
+        'FAPbIII_FAM': -8.74,
+        'MAPbClClCl_THTO': -11.27,
+        'CsPbBrBrBr_DMF': -6.46,
+        'CsPbBrBrBr_DMA': -7.5,
+        'FAPbClClCl_PYR': -5.7,
+        'CsPbBrBrBr_FAM': -6.67,
+        'CsPbClClCl_DMA': -7.87,
+        'CsPbClClCl_DMF': -6.81,
+        'MAPbIII_PYR': -0.02,
+        'FAPbIII_ACE': -5.55,
+        'MAPbBrBrBr_PYR': -6.16,
+        'MAPbIII_H2O': -4.98,
+        'FAPbBrBrBr_CHCl3': -1.53,
+        'CsPbBrBrBr_THTO': -9.75,
+        'MAPbClClCl_GBL': -7.2,
+        'FAPbClClCl_IPA': -3.99,
+        'FAPbIII_IPA': -5.18,
+        'CsPbClClCl_CHCl3': -1.21,
+        'MAPbClClCl_CHCl3': -1.47,
+        'MAPbIII_DMF': -8.55,
+        'MAPbIII_DMA': -8.38,
+        'MAPbIII_DMSO': -10.17,
+        'CsPbClClCl_THTO': -9.86,
+        'MAPbClClCl_ETH': -5.09,
+        'FAPbIII_PYR': -3.73,
+        'MAPbClClCl_PYR': -6.48,
+        'CsPbIII_IPA': -4.4,
+        'CsPbClClCl_GBL': -6.65,
+        'MAPbIII_CHCl3': -1.72,
+        'CsPbBrBrBr_MCR': -4.29,
+        'FAPbBrBrBr_MCR': -4.25,
+        'CsPbIII_PYR': -1.0,
+        'FAPbBrBrBr_NMP': -8.31,
+        'MAPbClClCl_CH3OH': -7.69,
+        'FAPbIII_GBL': -5.55,
+        'FAPbClClCl_NM': -4.46,
+        'FAPbClClCl_ACE': -5.16,
+        'FAPbClClCl_ETH': -3.52,
+        'MAPbIII_GBL': -6.09,
+        'FAPbBrBrBr_H2O': -7.79,
+        'FAPbIII_NM': -4.78,
+        'MAPbBrBrBr_NMP': -6.91,
+        'FAPbIII_DMSO': -8.54,
+        'MAPbClClCl_H2O': -8.6,
+        'CsPbIII_CHCl3': -1.57,
+        'CsPbIII_GBL': -5.7,
+        'CsPbClClCl_FAM': -8.92,
+        'CsPbBrBrBr_PYR': -6.09,
+        'FAPbIII_DMF': -7.09,
+        'CsPbIII_ACE': -5.42,
+        'CsPbBrBrBr_H2O': -5.04,
+        'CsPbClClCl_NM': -4.76,
+        'FAPbBrBrBr_NM': -4.88,
+        'CsPbClClCl_NMP': -7.85,
+        'MAPbClClCl_MCR': -8.03,
+        'MAPbIII_MCR': -9.95,
+        'MAPbIII_NMP': -8.06,
+        'CsPbIII_MCR': -4.29,
+        'FAPbBrBrBr_THTO': -8.48,
+        'FAPbIII_THTO': -11.27,
+        'CsPbIII_FAM': -6.83,
+        'FAPbClClCl_DMF': -8.08,
+        'FAPbBrBrBr_ETH': -7.08,
+        'FAPbClClCl_DMA': -7.76,
+        'CsPbIII_H2O': -4.83,
+        'FAPbIII_NMP': -8.51,
+        'MAPbIII_ETH': -4.75,
+        'CsPbBrBrBr_DMSO': -9.67,
+        'MAPbBrBrBr_MCR': -4.6,
+        'FAPbClClCl_MCR': -3.84,
+        'FAPbBrBrBr_GBL': -5.39,
+        'FAPbBrBrBr_ACE': -5.44
+    };
+
+    var solvent_subtotal = use_arithmetic_mean ? 0.0: 1.0;
+    for (solvent_name in all_solvents){
+        solvent_val = all_solvents[solvent_name];
+        if (solvent_val == "" || solvent_val == "0")
+            continue
+        s = solvent_name.split("_")[1].toUpperCase();
+
+        var halide_subtotal = use_arithmetic_mean ? 0.0: 1.0;
+        for (halide_name in all_halides){
+            halide_val = all_halides[halide_name];
+            if (halide_val == "" || halide_val == "0")
+                continue
+            h = halide_name.split("_")[1];
+            if (h != "i")
+                h = h.charAt(0).toUpperCase() + h.slice(1);
+            else
+                h = "I"
+
+            var cation_subtotal = use_arithmetic_mean ? 0.0: 1.0;
+            for (cation_name in all_cations){
+                cation_val = all_cations[cation_name];
+                if (cation_val == "" || cation_val == "0")
+                    continue
+                c = cation_name.split("_")[1];
+                if (c != "cs")
+                    c = c.toUpperCase();
+                else
+                    c = "Cs";
+
+                name = c + "Pb" + h + h + h + "_" + s;
+                if (use_arithmetic_mean)
+                    cation_subtotal += parseFloat(cation_val) * parseFloat(data[name]);
+                else
+                    cation_subtotal *= Math.pow(parseFloat(Math.abs(data[name])), parseFloat(cation_val));
+            }
+
+            if (use_arithmetic_mean)
+                halide_subtotal += parseFloat(halide_val) * parseFloat(cation_subtotal);
+            else
+                halide_subtotal *= Math.pow(parseFloat(Math.abs(cation_subtotal)), parseFloat(halide_val));
+        }
+
+        if (use_arithmetic_mean)
+            solvent_subtotal += parseFloat(solvent_val) * parseFloat(halide_subtotal);
+        else
+            solvent_subtotal *= Math.pow(parseFloat(Math.abs(halide_subtotal)), parseFloat(solvent_val));
+    }
+
+    if (!use_arithmetic_mean)
+        solvent_subtotal = -1.0 * Math.abs(solvent_subtotal);
+
+    var output_results = "";
+    var k = "";
+    var v = 0.0;
+    var p = solvent_subtotal / (high_energy - low_energy)
+
+    if (solvent_subtotal < high_energy){
+        output_results = "Extremely unlikely to form a precursor!";
+    } else if (solvent_subtotal > low_energy){
+        output_results = "Extremely likely to form a precursor!";
+    } else {
+        for (var i=0; i < cutoffs.length; i++){
+            v = cutoffs[i][0];
+            // alert(p + "_" + v);
+            if (p > v){
+                output_results = cutoffs[i][1];
+                break;
+            }
+        }
+    }
+
+    alert(
+        output_results + "\n" +
+        solvent_subtotal + " kcal/mol    " +
+        Math.round(p * 100.0) + " percentile\n" );
+}
+</script>
+
+<html>
+<header><title>PAL Calculator</title></header>
+<body>
+The Physical Analytics pipeLine (PAL) online calculator.  This will return an approximate intermolecular (solvent-salt) binding energy based on an arithmetic mean of the corresponding pure systems.
+<br>
+<br>
+<form onsubmit="return doSomething();" class="my-form">
+
+  <p>Please select mean function:</p>
+  <input type="radio" name="mean" value="arithmetic" checked> arithmetic<br>
+  <input type="radio" name="mean" value="geometric"> geometric<br>
+  <p></p>
+  Cations:
+  <p style="padding-left: 20px;"> Cs: <input type="text" name="cation_cs" id="cation_cs"> </p>
+  <p style="padding-left: 20px;"> MA: <input type="text" name="cation_ma" id="cation_ma"> </p>
+  <p style="padding-left: 20px;"> FA: <input type="text" name="cation_fa" id="cation_fa"> </p>
+  <br>
+  Halide:
+  <p style="padding-left: 20px;"> Cl: <input type="text" name="halide_cl" id="halide_cl"> </p>
+  <p style="padding-left: 20px;"> Br: <input type="text" name="halide_br" id="halide_br"> </p>
+  <p style="padding-left: 20px;"> I: <input type="text" name="halide_i" id="halide_i"> </p>
+  <br>
+  Solvent:
+  <p style="padding-left: 20px;"> THTO: <input type="text" name="solvent_thto" id="solvent_thto"> </p>
+  <p style="padding-left: 20px;"> DMSO: <input type="text" name="solvent_dmso" id="solvent_dmso"> </p>
+  <p style="padding-left: 20px;"> NM: <input type="text" name="solvent_nm" id="solvent_nm"> </p>
+  <p style="padding-left: 20px;"> NMP: <input type="text" name="solvent_nmp" id="solvent_nmp"> </p>
+  <p style="padding-left: 20px;"> ACE: <input type="text" name="solvent_ace" id="solvent_ace"> </p>
+  <p style="padding-left: 20px;"> MCR: <input type="text" name="solvent_mcr" id="solvent_mcr"> </p>
+  <p style="padding-left: 20px;"> GBL: <input type="text" name="solvent_gbl" id="solvent_gbl"> </p>
+  <p style="padding-left: 20px;"> DMF: <input type="text" name="solvent_dmf" id="solvent_dmf"> </p>
+  <p style="padding-left: 20px;"> DMA: <input type="text" name="solvent_dma" id="solvent_dma"> </p>
+  <p style="padding-left: 20px;"> ETH: <input type="text" name="solvent_eth" id="solvent_eth"> </p>
+  <p style="padding-left: 20px;"> CHCl3: <input type="text" name="solvent_chcl3" id="solvent_chcl3"> </p>
+  <p style="padding-left: 20px;"> IPA: <input type="text" name="solvent_ipa" id="solvent_ipa"> </p>
+  <p style="padding-left: 20px;"> PYR: <input type="text" name="solvent_pyr" id="solvent_pyr"> </p>
+  <p style="padding-left: 20px;"> CH3OH: <input type="text" name="solvent_ch3oh" id="solvent_ch3oh"> </p>
+  <p style="padding-left: 20px;"> FAM: <input type="text" name="solvent_fam" id="solvent_fam"> </p>
+  <p style="padding-left: 20px;"> H2O: <input type="text" name="solvent_h20" id="solvent_h20"> </p>
+  <br>
+  <input type="submit" value="Calculate">
+</form>
+</body>
+</html>

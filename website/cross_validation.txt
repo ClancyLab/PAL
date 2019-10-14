@@ -1,0 +1,18 @@
+         Full Data Set      Subset 1      Subset 2
+N1R2     1.49               0.81          0.91
+N1R3     1.41               1.01          1.14
+N3R2     ---                2.75          2.90
+N5R2     ---                ---           3.34
+
+Full Data Set:
+    ['DMF', 'DMA', 'GBL', 'NMP', 'ETH', 'NM', 'ACE', 'CHCl3', 'IPA', 'PYR', 'MCR', 'CH3OH', 'DMSO', 'THTO', 'FAM', 'H2O']
+    480 data points
+
+Subset 1:
+    ['DMF', 'NM', 'GBL', 'THTO', 'MCR', 'ACE', 'DMSO', 'NMP']
+    240 data points
+
+Subset 2:
+    ['THTO', 'MCR', 'ACE', 'DMF', 'NMP', 'NM']
+    180* data points
+    *For N5R2 we are missing a datapoint for FAPbClII_MCR
